@@ -9,10 +9,6 @@ class Logger {
 
     static __console_log = console.log;
 
-    static init() {
-        console.log = (m) => this.info(m);
-    }
-
     static log(msg, level) {
         switch (level) {
             case 1:
@@ -31,11 +27,11 @@ class Logger {
     }
 
     static error(msg) {
-        this.__console_log(chalk.red("[INFO]") + this.#getTimeStamp() + msg)
+        this.__console_log(chalk.red("[ERROR]") + this.#getTimeStamp() + msg)
     }
 
     static warn(msg) {
-        this.__console_log(chalk.yellow("[INFO]") + this.#getTimeStamp() + msg)
+        this.__console_log(chalk.yellow("[WARN]") + this.#getTimeStamp() + msg)
     }
 
     static #getTimeStamp() {
@@ -59,5 +55,7 @@ class Logger {
         )
     }
 }
+
+console.log = (m, l) => Logger.log(m, l);
 
 module.exports = {Logger};
