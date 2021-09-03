@@ -4,9 +4,20 @@
  */
 
 const http = require('http');
+const url = require('url');
+const fs = require('fs');
+const path = require('path');
+
+let conf;
 
 const server = http.createServer((req, res) => {
-    res.end('Hello World')
+    let urlPath = url.parse(req.url).path;
+    res.setHeader("server", "Craftions HTTP")
 })
 
-server.listen(80)
+module.exports = (CONFIG) => {
+    conf = CONFIG;
+    console.log("Starting HTTP Server on " + CONFIG.http.host + ":" + CONFIG.http.port + "...")
+    server.listen(CONFIG.http.port, CONFIG.http.host)
+    console.log("Started HTTP Server on " + CONFIG.http.host + ":" + CONFIG.http.port + "...")
+}
