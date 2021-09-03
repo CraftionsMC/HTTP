@@ -6,7 +6,8 @@
 const url = require('url');
 const chalk = require('chalk');
 const {Route} = require('../module/route')
-const {run} = require('../module/node')
+const nodeRunner = require('../module/node')
+const phpRunner = require('../module/php')
 const fs = require('fs');
 const path = require('path');
 const {getIndexes} = require("../module/indexing");
@@ -106,7 +107,12 @@ function runDir(host, reqPath, realReqPath, req, res) {
 function runFile(host, reqPath, req, res) {
     if (reqPath.endsWith(".nodex")) {
         if (host.enableNode)
-            run(reqPath, req, res);
+            nodeRunner.run(reqPath, req, res);
+        else
+            res.end(fs.readFileSync(reqPath));
+    } if (reqPath.endsWith(".php")) {
+        if (host.enableNode)
+            phpRunner.run(reqPath, req, res);
         else
             res.end(fs.readFileSync(reqPath));
     } else {
