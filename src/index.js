@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const {run} = require("./module/node");
-const {Logger} = require('./util/Logger');
+const {Logger} = require('./util/logger');
 const {Route} = require('./module/route');
 
 const VERSION = JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'))).version
