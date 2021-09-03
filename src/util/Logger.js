@@ -3,4 +3,6 @@
  * @copyright (c) 2018-2021 Ben Siebert. All rights reserved.
  */
 
-console.log('Hello World')
+export class Logger {
+
+}
