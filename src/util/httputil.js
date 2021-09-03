@@ -9,6 +9,7 @@ const {Route} = require('../module/route')
 const {run} = require('../module/node')
 const fs = require('fs');
 const path = require('path');
+const {getIndexes} = require("../module/indexing");
 
 let conf;
 let vhosts;
@@ -49,6 +50,7 @@ function processRequest(req, res) {
                     runDir(
                         host,
                         path.join(host.publicDir, reqPath),
+                        reqPath,
                         req,
                         res
                     )
@@ -82,7 +84,7 @@ function processRequest(req, res) {
     }
 }
 
-function runDir(host, reqPath, req, res) {
+function runDir(host, reqPath, realReqPath, req, res) {
     let f = false;
     for (let i = 0; i < host.indexFiles.length; i++) {
         if (fs.existsSync(path.join(reqPath, host.indexFiles[i]))) {
@@ -97,7 +99,7 @@ function runDir(host, reqPath, req, res) {
         }
     }
     if (!f) {
-        res.end("The Resource was not found.")
+        res.end(getIndexes(realReqPath, reqPath));
     }
 }
 
