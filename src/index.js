@@ -38,11 +38,22 @@ if (!fs.existsSync(HOME_DIR)) {
 
     fs.mkdirSync(HOME_DIR);
 
+    fs.mkdirSync(path.join(HOME_DIR, "vhosts"));
+
+    fs.mkdirSync(path.join(HOME_DIR, "vhosts/localhost"));
+
+    fs.writeFileSync(path.join(HOME_DIR, "vhosts/localhost/index.html"), "<h1>Hello World</h1>");
+
     fs.writeFileSync(path.join(HOME_DIR, "vhosts.json"), JSON.stringify({
         hosts: [
             {
                 serverName: "localhost",
-
+                publicDir: path.join(HOME_DIR, "vhosts/localhost/"),
+                indexFiles: [
+                    "index.node",
+                    "index.html"
+                ],
+                enableNode: true
             }
         ]
     }));
@@ -60,7 +71,8 @@ if (!fs.existsSync(HOME_DIR)) {
 }
 
 const CONFIG = require(path.join(HOME_DIR, "config.json"));
+const VHOSTS = require(path.join(HOME_DIR, "vhosts.json"))
 
 if(CONFIG.http.enable) {
-    require('./module/http.server')(CONFIG);
+    require('./module/http.server')(CONFIG, VHOSTS);
 }

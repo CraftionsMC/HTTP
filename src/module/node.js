@@ -7,6 +7,7 @@ const fs = require('fs')
 
 function run(absolutePath, req, res) {
     require(absolutePath)(req, res);
+    delete require.cache[require.resolve(absolutePath)]
 }
 
 module.exports = {run};
