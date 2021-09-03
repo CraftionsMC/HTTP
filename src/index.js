@@ -41,6 +41,7 @@ if (!fs.existsSync(HOME_DIR)) {
 
     fs.mkdirSync(path.join(HOME_DIR, "vhosts"));
 
+
     fs.mkdirSync(path.join(HOME_DIR, "vhosts/localhost"));
 
     fs.writeFileSync(path.join(HOME_DIR, "vhosts/localhost/index.html"), "<h1>Hello World</h1>");
@@ -66,7 +67,7 @@ if (!fs.existsSync(HOME_DIR)) {
             enable: true,
             port: 80,
             host: "0.0.0.0"
-        },
+        }
     }))
 
 }

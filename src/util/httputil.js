@@ -23,7 +23,7 @@ function processRequest(req, res) {
 
     if (Route.hasRouteAt(reqPath)) {
         let r = Route.getRouteAt(reqPath);
-        if(r.vhost.split(" ").includes(reqHost) || r.vhost === '') {
+        if (r.vhost.split(" ").includes(reqHost) || r.vhost === '') {
             Route.getRouteAt(reqPath).callback(req, res);
             return;
         }
@@ -112,7 +112,9 @@ function runFile(host, reqPath, req, res) {
     }
 }
 
-module.exports = {processRequest, init: (CONFIG, VHOSTS) => {
+module.exports = {
+    processRequest, init: (CONFIG, VHOSTS) => {
         conf = CONFIG;
         vhosts = VHOSTS;
-}}
+    }
+}
