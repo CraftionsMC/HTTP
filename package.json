@@ -2,9 +2,9 @@
   "name": "craftions-http-server",
   "version": "1.0.0",
   "description": "An advanced HTTP Server",
-  "main": "src/index.js",
+  "main": "bin/index.js",
   "scripts": {
-
+    "ts:build": "tsc"
   },
   "repository": {
     "type": "git",
@@ -21,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/CraftionsMC/HTTP/issues"
   },
-  "homepage": "https://github.com/CraftionsMC/HTTP#readme"
+  "homepage": "https://github.com/CraftionsMC/HTTP#readme",
+  "devDependencies": {
+    "typescript": "^4.4.2"
+  }
 }
