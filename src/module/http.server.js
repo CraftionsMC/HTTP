@@ -10,6 +10,7 @@ const path = require('path');
 const os = require("os");
 const {run} = require("./node");
 const chalk = require("chalk");
+const {Route} = require('./route')
 
 const HOME_DIR = path.join(os.userInfo().homedir, ".craftions_http");
 
@@ -24,6 +25,14 @@ const server = http.createServer((req, res) => {
     console.log(chalk.yellow(reqHost) + " : " + chalk.blue(req.method + " ") + reqPath);
 
     res.setHeader("server", "Craftions HTTP")
+
+    if (Route.hasRouteAt(reqPath)) {
+        let r = Route.getRouteAt(reqPath);
+        if(r.vhost.split(" ").includes(reqHost) || r.vhost === '') {
+            Route.getRouteAt(reqPath).callback(req, res);
+            return;
+        }
+    }
 
     let foundHost = false;
 
@@ -51,10 +60,8 @@ const server = http.createServer((req, res) => {
                 let f = false;
                 for (let i = 0; i < host.indexFiles.length; i++) {
                     let fx = "." + host.indexFiles[i].split(".")[
-                        host.indexFiles[i].split(".").length - 1
+                    host.indexFiles[i].split(".").length - 1
                         ];
-
-                    console.log(fx)
 
                     if (fs.existsSync(path.join(host.publicDir, reqPath + fx))) {
                         f = true;
@@ -113,5 +120,5 @@ module.exports = (CONFIG, VHOSTS) => {
     vhosts = VHOSTS;
     console.log("Starting HTTP Server on " + CONFIG.http.host + ":" + CONFIG.http.port + "...")
     server.listen(CONFIG.http.port, CONFIG.http.host)
-    console.log("Started HTTP Server on " + CONFIG.http.host + ":" + CONFIG.http.port + "...")
+    console.log("Started HTTP Server on " + CONFIG.http.host + ":" + CONFIG.http.port)
 }

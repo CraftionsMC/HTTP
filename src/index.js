@@ -8,6 +8,7 @@ const path = require('path');
 const os = require('os');
 const child_process = require('child_process');
 const {Logger} = require('./util/Logger');
+const {Route} = require('./module/route')
 
 const VERSION = JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'))).version
 const HOME_DIR = path.join(os.userInfo().homedir, ".craftions_http");
@@ -70,9 +71,19 @@ if (!fs.existsSync(HOME_DIR)) {
 
 }
 
+fs.readdirSync(path.join(HOME_DIR, "plugins")).forEach(f => {
+    if (f.endsWith(".js")) {
+        let plugin = require(path.join(HOME_DIR, "plugins", f))
+        plugin.create({
+            Route: Route
+        })
+        console.log("Loaded \"" + plugin.name + "\" v" + plugin.version + " by " + plugin.author);
+    }
+})
+
 const CONFIG = require(path.join(HOME_DIR, "config.json"));
 const VHOSTS = require(path.join(HOME_DIR, "vhosts.json"))
 
-if(CONFIG.http.enable) {
+if (CONFIG.http.enable) {
     require('./module/http.server')(CONFIG, VHOSTS);
 }
