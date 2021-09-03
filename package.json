@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "An advanced HTTP Server",
   "main": "src/index.js",
+  "bin": {
+    "craftions-http": "./src/index.js"
+  },
   "scripts": {},
   "repository": {
     "type": "git",
