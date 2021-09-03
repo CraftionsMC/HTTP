@@ -6,9 +6,9 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const child_process = require('child_process');
+const {run} = require("./module/node");
 const {Logger} = require('./util/Logger');
-const {Route} = require('./module/route')
+const {Route} = require('./module/route');
 
 const VERSION = JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'))).version
 const HOME_DIR = path.join(os.userInfo().homedir, ".craftions_http");
@@ -48,7 +48,7 @@ if (!fs.existsSync(HOME_DIR)) {
     fs.writeFileSync(path.join(HOME_DIR, "vhosts.json"), JSON.stringify({
         hosts: [
             {
-                serverName: "localhost",
+                serverName: "localhost 127.0.0.1",
                 publicDir: path.join(HOME_DIR, "vhosts/localhost/"),
                 indexFiles: [
                     "index.nodex",
@@ -75,7 +75,8 @@ fs.readdirSync(path.join(HOME_DIR, "plugins")).forEach(f => {
     if (f.endsWith(".js")) {
         let plugin = require(path.join(HOME_DIR, "plugins", f))
         plugin.create({
-            Route: Route
+            Route: Route,
+            NodeRun: run
         })
         console.log("Loaded \"" + plugin.name + "\" v" + plugin.version + " by " + plugin.author);
     }

@@ -37,7 +37,7 @@ const server = http.createServer((req, res) => {
     let foundHost = false;
 
     vhosts.hosts.forEach(host => {
-        if (reqHost === host.serverName) {
+        if (reqHost === host.serverName || host.serverName.split(" ").includes(reqHost)) {
             foundHost = true;
 
             if (fs.existsSync(path.join(host.publicDir, reqPath))) {
