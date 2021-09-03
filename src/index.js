@@ -8,6 +8,7 @@ const path = require('path');
 const os = require('os');
 const nodeRunner = require("./module/node");
 const phpRunner = require("./module/php");
+const pythonRunner = require("./module/python");
 const {Logger} = require('./util/logger');
 const {Route} = require('./module/route');
 
@@ -58,7 +59,8 @@ if (!fs.existsSync(HOME_DIR)) {
                     "index.html"
                 ],
                 enableNode: true,
-                enablePHP: true
+                enablePHP: true,
+                enablePython: true
             }
         ]
     }));
@@ -81,7 +83,8 @@ fs.readdirSync(path.join(HOME_DIR, "plugins")).forEach(f => {
         plugin.create({
             Route: Route,
             NodeRun: nodeRunner.run,
-            PhpRun: phpRunner.run
+            PhpRun: phpRunner.run,
+            PythonRun: pythonRunner.run
         })
         console.log("Loaded \"" + plugin.name + "\" v" + plugin.version + " by " + plugin.author);
     }

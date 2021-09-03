@@ -8,6 +8,7 @@ const chalk = require('chalk');
 const {Route} = require('../module/route')
 const nodeRunner = require('../module/node')
 const phpRunner = require('../module/php')
+const pythonRunner = require('../module/python')
 const fs = require('fs');
 const path = require('path');
 const {getIndexes} = require("../module/indexing");
@@ -113,6 +114,11 @@ function runFile(host, reqPath, req, res) {
     } if (reqPath.endsWith(".php")) {
         if (host.enablePHP)
             phpRunner.run(reqPath, req, res);
+        else
+            res.end(fs.readFileSync(reqPath));
+    } if (reqPath.endsWith(".py")) {
+        if (host.enablePython)
+            pythonRunner.run(reqPath, req, res);
         else
             res.end(fs.readFileSync(reqPath));
     } else {
