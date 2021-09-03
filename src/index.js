@@ -50,7 +50,7 @@ if (!fs.existsSync(HOME_DIR)) {
                 serverName: "localhost",
                 publicDir: path.join(HOME_DIR, "vhosts/localhost/"),
                 indexFiles: [
-                    "index.node",
+                    "index.nodex",
                     "index.html"
                 ],
                 enableNode: true

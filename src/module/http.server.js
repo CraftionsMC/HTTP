@@ -9,6 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require("os");
 const {run} = require("./node");
+const chalk = require("chalk");
 
 const HOME_DIR = path.join(os.userInfo().homedir, ".craftions_http");
 
@@ -17,10 +18,10 @@ let vhosts;
 
 const server = http.createServer((req, res) => {
 
-    let parsedURL = url.parse(req.url);
-
     let reqHost = req.headers.host;
-    let reqPath = parsedURL.path;
+    let reqPath = url.parse(req.url).path;
+
+    console.log(chalk.yellow(reqHost) + " : " + chalk.blue(req.method + " ") + reqPath);
 
     res.setHeader("server", "Craftions HTTP")
 
@@ -39,25 +40,35 @@ const server = http.createServer((req, res) => {
                         res
                     )
                 } else {
-                    let f = false;
-                    for (let i = 0; i < host.indexFiles.length; i++) {
-                        if(fs.existsSync(path.join(host.publicDir, reqPath, host.indexFiles[i]))) {
-                            f = true;
-                            runFile(
-                                host,
-                                path.join(host.publicDir, reqPath, host.indexFiles[i]),
-                                req,
-                                res
-                            )
-                            break;
-                        }
-                    }
-                    if(!f) {
-                        res.end("The Resource was not found.")
-                    }
+                    runDir(
+                        host,
+                        path.join(host.publicDir, reqPath),
+                        req,
+                        res
+                    )
                 }
             } else {
-                res.end("The Resource was not found.")
+                let f = false;
+                for (let i = 0; i < host.indexFiles.length; i++) {
+                    let fx = "." + host.indexFiles[i].split(".")[
+                        host.indexFiles[i].split(".").length - 1
+                        ];
+
+                    console.log(fx)
+
+                    if (fs.existsSync(path.join(host.publicDir, reqPath + fx))) {
+                        f = true;
+                        runFile(
+                            host,
+                            path.join(host.publicDir, reqPath + fx),
+                            req,
+                            res
+                        )
+                    }
+                }
+
+                if (!f)
+                    res.end("The Resource was not found.")
             }
         }
     })
@@ -67,8 +78,27 @@ const server = http.createServer((req, res) => {
     }
 })
 
+function runDir(host, reqPath, req, res) {
+    let f = false;
+    for (let i = 0; i < host.indexFiles.length; i++) {
+        if (fs.existsSync(path.join(host.publicDir, reqPath, host.indexFiles[i]))) {
+            f = true;
+            runFile(
+                host,
+                path.join(host.publicDir, reqPath, host.indexFiles[i]),
+                req,
+                res
+            )
+            break;
+        }
+    }
+    if (!f) {
+        res.end("The Resource was not found.")
+    }
+}
+
 function runFile(host, reqPath, req, res) {
-    if (reqPath.endsWith(".xnode")) {
+    if (reqPath.endsWith(".nodex")) {
         if (host.enableNode)
             run(reqPath, req, res);
         else

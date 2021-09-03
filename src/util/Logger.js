@@ -49,8 +49,6 @@ class Logger {
             + d.getMinutes()
             + ":"
             + d.getSeconds()
-            + ":"
-            + d.getMilliseconds()
             + " "
         )
     }
