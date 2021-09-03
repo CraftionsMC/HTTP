@@ -111,7 +111,7 @@ function runFile(host, reqPath, req, res) {
         else
             res.end(fs.readFileSync(reqPath));
     } if (reqPath.endsWith(".php")) {
-        if (host.enableNode)
+        if (host.enablePHP)
             phpRunner.run(reqPath, req, res);
         else
             res.end(fs.readFileSync(reqPath));

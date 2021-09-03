@@ -6,7 +6,8 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const {run} = require("./module/node");
+const nodeRunner = require("./module/node");
+const phpRunner = require("./module/php");
 const {Logger} = require('./util/logger');
 const {Route} = require('./module/route');
 
@@ -53,9 +54,11 @@ if (!fs.existsSync(HOME_DIR)) {
                 publicDir: path.join(HOME_DIR, "vhosts/localhost/"),
                 indexFiles: [
                     "index.nodex",
+                    "index.php",
                     "index.html"
                 ],
-                enableNode: true
+                enableNode: true,
+                enablePHP: true
             }
         ]
     }));
@@ -77,7 +80,8 @@ fs.readdirSync(path.join(HOME_DIR, "plugins")).forEach(f => {
         let plugin = require(path.join(HOME_DIR, "plugins", f))
         plugin.create({
             Route: Route,
-            NodeRun: run
+            NodeRun: nodeRunner.run,
+            PhpRun: phpRunner.run
         })
         console.log("Loaded \"" + plugin.name + "\" v" + plugin.version + " by " + plugin.author);
     }
