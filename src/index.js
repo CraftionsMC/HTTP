@@ -56,6 +56,7 @@ if (!fs.existsSync(HOME_DIR)) {
                 indexFiles: [
                     "index.nodex",
                     "index.php",
+                    "index.py",
                     "index.html"
                 ],
                 enableNode: true,
