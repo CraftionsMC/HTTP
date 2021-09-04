@@ -9,6 +9,7 @@ const {Route} = require('../module/route')
 const nodeRunner = require('../module/node')
 const phpRunner = require('../module/php')
 const pythonRunner = require('../module/python')
+const incodeRunner = require('../module/incode')
 const fs = require('fs');
 const path = require('path');
 const {getIndexes} = require("../module/indexing");
@@ -121,6 +122,8 @@ function runFile(host, reqPath, req, res) {
             pythonRunner.run(reqPath, req, res);
         else
             res.end(fs.readFileSync(reqPath));
+    } if (reqPath.endsWith(".ic")) {
+        incodeRunner.run(reqPath, req, res);
     } else {
         res.end(fs.readFileSync(reqPath));
     }
