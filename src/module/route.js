@@ -19,7 +19,8 @@ class Route {
         let rCode = false;
 
         this.routes.forEach(r => {
-            if(path.startsWith(r.pathBegin)) {
+            console.log("/" + path.split("/")[1])
+            if("/" + path.split("/")[1] === r.pathBegin) {
                 rCode = true;
             }
         })

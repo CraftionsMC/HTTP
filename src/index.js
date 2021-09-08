@@ -3,17 +3,29 @@
  * @copyright (c) 2018-2021 Ben Siebert. All rights reserved.
  */
 
+const {program} = require('commander')
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const nodeRunner = require("./module/node");
-const phpRunner = require("./module/php");
-const pythonRunner = require("./module/python");
-const {Logger} = require('./util/logger');
-const {Route} = require('./module/route');
+const {Logger} = require("./util/logger");
+const {loadPlugin} = require("./util/plugin");
 
 const VERSION = JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'))).version
-const HOME_DIR = path.join(os.userInfo().homedir, ".craftions_http");
+
+program
+    .option("-d, --dev", "Start a basic version of the HTTP Server")
+    .option("-r, --root <path>", "Sets the root directory. Only works with -d")
+
+program.version(VERSION)
+
+program.parse(process.argv);
+
+const options = program.opts();
+
+if ((options.root && !options.dev) || (options.dev && !options.root)) {
+    console.log("-r can only be used with -d")
+    process.exit(1)
+}
 
 Logger.__console_log("\n" +
     "\n" +
@@ -34,25 +46,18 @@ Logger.__console_log("\n" +
     "\n"
 )
 
-console.log("Config Home Directory: " + HOME_DIR)
-
-if (!fs.existsSync(HOME_DIR)) {
-    console.log("The Config Home Directory does not exist! Creating new one...", 1)
-
-    fs.mkdirSync(HOME_DIR);
-
-    fs.mkdirSync(path.join(HOME_DIR, "vhosts"));
-
-
-    fs.mkdirSync(path.join(HOME_DIR, "vhosts/localhost"));
-
-    fs.writeFileSync(path.join(HOME_DIR, "vhosts/localhost/index.html"), "<h1>Hello World</h1>");
-
-    fs.writeFileSync(path.join(HOME_DIR, "vhosts.json"), JSON.stringify({
+if (options.dev && options.root) {
+    require('./module/http.server')({
+        http: {
+            enable: true,
+            port: 80,
+            host: "0.0.0.0"
+        }
+    }, {
         hosts: [
             {
-                serverName: "localhost 127.0.0.1",
-                publicDir: path.join(HOME_DIR, "vhosts/localhost/"),
+                serverName: "*",
+                publicDir: options.root,
                 indexFiles: [
                     "index.nodex",
                     "index.php",
@@ -64,36 +69,79 @@ if (!fs.existsSync(HOME_DIR)) {
                 enablePython: true
             }
         ]
-    }));
+    })
+} else {
 
-    fs.mkdirSync(path.join(HOME_DIR, "plugins"));
+    const HOME_DIR = path.join(os.userInfo().homedir, ".craftions_http");
 
-    fs.writeFileSync(path.join(HOME_DIR, "config.json"), JSON.stringify({
-        http: {
-            enable: true,
-            port: 80,
-            host: "0.0.0.0"
-        }
-    }))
+    console.log("Config Home Directory: " + HOME_DIR)
 
-}
+    if (!fs.existsSync(HOME_DIR)) {
+        console.log("The Config Home Directory does not exist! Creating new one...", 1)
 
-fs.readdirSync(path.join(HOME_DIR, "plugins")).forEach(f => {
-    if (f.endsWith(".js")) {
-        let plugin = require(path.join(HOME_DIR, "plugins", f))
-        plugin.create({
-            Route: Route,
-            NodeRun: nodeRunner.run,
-            PhpRun: phpRunner.run,
-            PythonRun: pythonRunner.run
-        })
-        console.log("Loaded \"" + plugin.name + "\" v" + plugin.version + " by " + plugin.author);
+        fs.mkdirSync(HOME_DIR);
+
+        fs.mkdirSync(path.join(HOME_DIR, "vhosts"));
+
+
+        fs.mkdirSync(path.join(HOME_DIR, "vhosts/localhost"));
+
+        fs.writeFileSync(path.join(HOME_DIR, "vhosts/localhost/index.html"), "<h1>Hello World</h1>");
+
+        fs.writeFileSync(path.join(HOME_DIR, "vhosts.json"), JSON.stringify({
+            hosts: [
+                {
+                    serverName: "localhost 127.0.0.1",
+                    publicDir: path.join(HOME_DIR, "vhosts/localhost/"),
+                    indexFiles: [
+                        "index.nodex",
+                        "index.php",
+                        "index.py",
+                        "index.html"
+                    ],
+                    enableNode: true,
+                    enablePHP: true,
+                    enablePython: true
+                }
+            ]
+        }));
+
+        fs.mkdirSync(path.join(HOME_DIR, "plugins"));
+
+        fs.writeFileSync(path.join(HOME_DIR, "config.json"), JSON.stringify({
+            http: {
+                enable: true,
+                port: 80,
+                host: "0.0.0.0"
+            }
+        }))
+
     }
-})
 
-const CONFIG = require(path.join(HOME_DIR, "config.json"));
-const VHOSTS = require(path.join(HOME_DIR, "vhosts.json"))
+    fs.readdirSync(path.join(__dirname, 'plugins', 'default')).forEach(f => {
+        if (fs.lstatSync(path.join(__dirname, "plugins", "default", f)).isDirectory()) {
+            loadPlugin(path.join(__dirname, "plugins", "default", f, "index.js"))
+        } else {
+            if (f.endsWith(".js")) {
+                loadPlugin(path.join(__dirname, "plugins", "default", f))
+            }
+        }
+    })
 
-if (CONFIG.http.enable) {
-    require('./module/http.server')(CONFIG, VHOSTS);
+    fs.readdirSync(path.join(HOME_DIR, "plugins")).forEach(f => {
+        if (fs.lstatSync(path.join(HOME_DIR, "plugins", f)).isDirectory()) {
+            loadPlugin(path.join(HOME_DIR, "plugins", f, "index.js"))
+        } else {
+            if (f.endsWith(".js")) {
+                loadPlugin(path.join(HOME_DIR, "plugins", f))
+            }
+        }
+    })
+
+    const CONFIG = require(path.join(HOME_DIR, "config.json"));
+    const VHOSTS = require(path.join(HOME_DIR, "vhosts.json"))
+
+    if (CONFIG.http.enable) {
+        require('./module/http.server')(CONFIG, VHOSTS);
+    }
 }

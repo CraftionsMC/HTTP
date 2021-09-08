@@ -36,7 +36,7 @@ function processRequest(req, res) {
     let foundHost = false;
 
     vhosts.hosts.forEach(host => {
-        if (reqHost === host.serverName || host.serverName.split(" ").includes(reqHost)) {
+        if (reqHost === host.serverName || host.serverName.split(" ").includes(reqHost) || host.serverName.includes("*")) {
             foundHost = true;
 
             console.log(chalk.italic("=> " + path.join(host.publicDir, reqPath)))

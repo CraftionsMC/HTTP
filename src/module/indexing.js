@@ -10,9 +10,12 @@ function getIndexes(currentPath, absolutePath) {
 
     let x = "";
 
+    if(!currentPath.endsWith("/"))
+        currentPath += "/";
+
     fs.readdirSync(absolutePath).forEach(file => {
         if (!file.startsWith(".")) {
-            x += "<a href='" + currentPath + "/" + file + "'>" + file + "</a><br>"
+            x += "<a href='" + currentPath + file + "'>" + file + "</a><br>"
         }
     })
 
