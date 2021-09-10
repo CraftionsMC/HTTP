@@ -4,7 +4,10 @@
   "description": "An advanced HTTP Server",
   "main": "src/index.js",
   "bin": {
-    "craftions-http": "./src/index.js"
+    "http": "bin/http.js"
+  },
+  "directories": {
+    "bin": "./bin"
   },
   "scripts": {},
   "repository": {
